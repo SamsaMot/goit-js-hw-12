@@ -54,6 +54,7 @@ async function handleSubmit(event) {
     if (data.hits.length < 15 || currentPage * 15 >= data.totalHits) {
       render.hideLoadMoreButton();
       showEndMessage();
+      showEndOfResultsToast();
     } else {
       render.showLoadMoreButton();
     }
@@ -82,6 +83,9 @@ async function handleLoadMore() {
     const data = await getImagesByQuery(searchQuery, currentPage);
 
     if (!data.hits || data.hits.length === 0) {
+      render.hideLoadMoreButton();
+      showEndMessage();
+      showEndOfResultsToast();
       return;
     }
 
@@ -91,6 +95,7 @@ async function handleLoadMore() {
     if (totalLoaded >= data.totalHits) {
       render.hideLoadMoreButton();
       showEndMessage();
+      showEndOfResultsToast();
     } else {
       render.showLoadMoreButton();
     }
@@ -131,4 +136,15 @@ function showEndMessage() {
 
 function hideEndMessage() {
   endMessage.classList.add("hide");
+}
+
+function showEndOfResultsToast() {
+  iziToast.info({
+    message: "We're sorry, but you've reached the end of search results.",
+    messageColor: "#fafafb",
+    backgroundColor: "#4e75ff",
+    messageSize: "16px",
+    position: "topRight",
+    icon: "material-icons",
+  });
 }
