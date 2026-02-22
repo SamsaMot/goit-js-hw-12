@@ -1,49 +1,134 @@
-
-import {getImagesByQuery} from "./js/pixabay-api.js";
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+import { getImagesByQuery } from "./js/pixabay-api.js";
 import * as render from "./js/render-functions.js";
 
 const form = document.querySelector(".form");
 const input = document.querySelector("input");
-export const gallery = document.querySelector(".gallery");
-export const loader = document.querySelector(".loader");
+const loadMoreBtn = document.querySelector(".load-more-btn");
+const endMessage = document.querySelector(".end-message");
+
+let searchQuery = "";
+let currentPage = 1;
 
 form.addEventListener("submit", handleSubmit);
-gallery.addEventListener("click", handleClick);
+loadMoreBtn.addEventListener("click", handleLoadMore);
 
+async function handleSubmit(event) {
+  event.preventDefault();
+  searchQuery = input.value.trim();
 
-export let inputHandle = "";
+  if (searchQuery === "") {
+    iziToast.warning({
+      message: "Please enter a search query.",
+      position: "topRight",
+    });
+    return;
+  }
 
- function handleSubmit(event){
-    event.preventDefault();
-    render.showLoader(); 
-    render.clearGallery();
-   inputHandle = input.value.trim();
-    if(inputHandle === ""){
-        render.hideLoader()
-        return;
+  render.hideLoadMoreButton();
+  hideEndMessage();
+  render.clearGallery();
+  render.showLoader();
+
+  currentPage = 1;
+
+  try {
+    const data = await getImagesByQuery(searchQuery, currentPage);
+
+    if (!data.hits || data.hits.length === 0) {
+      iziToast.error({
+        message:
+          "Sorry, there are no images matching your search query. Please try again!",
+        messageColor: "#fafafb",
+        backgroundColor: "#ef4040",
+        messageSize: "16px",
+        position: "topRight",
+        icon: "material-icons",
+      });
+      return;
     }
-    processingResponse()
+
+    render.createGallery(data.hits);
+
+    if (data.hits.length < 15 || currentPage * 15 >= data.totalHits) {
+      render.hideLoadMoreButton();
+      showEndMessage();
+    } else {
+      render.showLoadMoreButton();
+    }
+  } catch {
+    iziToast.error({
+      message:
+        "Sorry, there are no images matching your search query. Please try again!",
+      messageColor: "#fafafb",
+      backgroundColor: "#ef4040",
+      messageSize: "16px",
+      position: "topRight",
+      icon: "material-icons",
+    });
+  } finally {
+    render.hideLoader();
+  }
 }
 
-function processingResponse(){
-    getImagesByQuery(inputHandle)
-    .then(response => {
-        if(response.length === 0){
-           render.showError();
-        } else{
-        render.markup(response);
+async function handleLoadMore() {
+  render.hideLoadMoreButton();
+  render.showLoader();
+
+  currentPage += 1;
+
+  try {
+    const data = await getImagesByQuery(searchQuery, currentPage);
+
+    if (!data.hits || data.hits.length === 0) {
+      return;
     }
-})
-    .catch(() => {
-        render.showError();
-})
-    .finally(() => {
-        render.hideLoader();
-    })   
+
+    render.createGallery(data.hits);
+
+    const totalLoaded = currentPage * 15;
+    if (totalLoaded >= data.totalHits) {
+      render.hideLoadMoreButton();
+      showEndMessage();
+    } else {
+      render.showLoadMoreButton();
+    }
+
+    scrollToNewImages();
+  } catch {
+    iziToast.error({
+      message:
+        "Sorry, there are no images matching your search query. Please try again!",
+      messageColor: "#fafafb",
+      backgroundColor: "#ef4040",
+      messageSize: "16px",
+      position: "topRight",
+      icon: "material-icons",
+    });
+    render.showLoadMoreButton();
+  } finally {
+    render.hideLoader();
+  }
 }
-    
-function handleClick(event){
-if (!event.target.classList.contains("gallery-img")){
- return;
+
+function scrollToNewImages() {
+  const galleryItems = document.querySelectorAll(".gallery-list");
+  if (galleryItems.length < 2) return;
+
+  const { height: cardHeight } =
+    galleryItems[galleryItems.length - 1].getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: "smooth",
+  });
 }
+
+function showEndMessage() {
+  endMessage.classList.remove("hide");
+}
+
+function hideEndMessage() {
+  endMessage.classList.add("hide");
 }
