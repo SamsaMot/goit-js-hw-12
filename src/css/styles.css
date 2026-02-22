@@ -1,0 +1,109 @@
+@import url('./reset.css');
+@import url('./base.css');
+
+
+.form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding-top: 36px;
+}
+.input-label input {
+    width: 272px;
+    height: 40px;
+    border: 1px solid #808080;
+    border-radius: 4px;
+    
+}
+.input-label input:hover {
+    border-color: #000;
+}
+
+.input-label input:active {
+   border-color:#4e75ff;
+}
+.input-btn {
+    width: 91px;
+    height: 40px;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 8px 16px;
+    background-color: #4e75ff;
+    color: #fff;
+
+}
+
+.input-btn:hover{
+    background-color: #6c8cff;
+}
+
+ul{
+    display: flex;
+
+}
+.gallery{
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 15px;
+}
+.gallery-list{
+
+    width: calc((100% - 48px) / 3);
+    
+}
+.gallery-link {
+}
+.gallery-img {
+    min-width: 100%;
+    border: 1px solid #808080;
+    border-bottom: none;
+    
+}
+.info {
+    display: flex;
+    justify-content: space-evenly;
+    text-align: center;
+    gap: 0;
+    border: 1px solid #808080;
+    border-top: none;
+   
+}
+.info-list {
+    height: 48px;
+    
+}
+.gallery-item-title {
+   font-size: 12px;
+   line-height: 1.3;
+}
+.gallery-item-text {
+  font-size: 12px;
+  line-height: 2;
+}
+
+.loader {
+  position: absolute;
+  left: 45%;
+  width: 48px;
+  height: 48px;
+  border: 5px solid;
+  border-color: #FF3D00 transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  margin-top: 10px;
+}
+
+.hide{
+    display: none;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 
